@@ -1,8 +1,31 @@
 <template>
-  <div>
-    <b-button variant="primary" @click.stop="girisButon">
-    </b-button>
-  </div>
+  <b-container fluid>
+    <br><br><br>
+    <b-row class="my-1">
+      <b-col sm="3">
+        <label>İstenen Sicaklik: </label>
+      </b-col>
+      <b-col sm="6">
+        <b-form-input v-model="istenenSicaklik"></b-form-input>
+      </b-col>
+      <b-col sm="3">
+        <b-button variant="primary" @click.stop="sicakligiDegistirButton"> Sıcaklığı Değiştir
+        </b-button>
+      </b-col>
+    </b-row>
+    <b-row class="my-1">
+      <b-col sm="3">
+        <label>Gelen Sicaklik: </label>
+      </b-col>
+      <b-col sm="6">
+        <b-form-input v-model="gelenSicaklik"></b-form-input>
+      </b-col>
+    </b-row>
+    <!-- <div>
+      <b-button variant="primary" @click.stop="girisButon"> Sıcaklığı Değiştir
+      </b-button>
+    </div> -->
+  </b-container>
   <!-- <div class="app flex-row align-items-center">
     <div class="container"> -->
       <!-- <div v-if="loginType==='userpass'">
@@ -61,6 +84,12 @@ import axios from "axios";
 
 export default {
   name: 'HelloWorld',
+  data() {
+    return {
+      istenenSicaklik: '',
+      gelenSicaklik: 0,
+    }
+  },
   // props: {
   //   msg: String
   // },
@@ -78,21 +107,40 @@ export default {
   //     }
   //   },
     methods: {
-      girisButon(){
+      sicakligiDegistirButton(){
         console.log("basildi")
         const config = {
           headers: {
             'Content-Type': 'application/json'
           },
-          data: {},
+          data: {
+            "istenenSicaklik": this.istenenSicaklik
+          },
         };
+        const data = {
+          "istenenSicaklik" : this.istenenSicaklik
+        }
+        console.log("isss: ", data)
         axios.
-          get("http://localhost:8080/api/basic", config)
+          post("http://localhost:8080/api/basic", data)
             .then(response => {
               console.log("response: ", response);
             })
             .catch(error => {
               console.log("error: ", error)
+            })
+      },
+      sicakligiOku(){
+        const data = {
+          "istenenSicaklik" : this.istenenSicaklik
+        }
+        axios.
+          post("http://localhost:8080/api/readTemperature", data)
+            .then(response => {
+              console.log("gelenDeğer: ", response)
+            })
+            .catch(error => {
+              console.log("gelenDeğerError: ", error)
             })
       }
     },
@@ -127,6 +175,16 @@ export default {
     // },
     created() {
       console.log("123123");
+      var these = this
+      window.setInterval(function(){
+        these.sicakligiOku()
+      }, 1000);
+      console.log(":::")
+    },
+    watch: {
+      istenenSicaklik(next, prev){
+        console.log(prev, next);
+      }
     }
 }
 </script>
